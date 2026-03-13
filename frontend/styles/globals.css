@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 235 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 94%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 235 85% 96%;
+    --accent-foreground: 235 85% 40%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 235 85% 55%;
+    --radius: 0.75rem;
+
+    --sidebar-bg: 225 30% 12%;
+    --sidebar-fg: 220 20% 85%;
+    --sidebar-accent: 235 85% 55%;
+    --sidebar-border: 225 25% 18%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+}
+
+/* Sidebar */
+.sidebar {
+  background: hsl(var(--sidebar-bg));
+  color: hsl(var(--sidebar-fg));
+  border-right: 1px solid hsl(var(--sidebar-border));
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200;
+  color: hsl(var(--sidebar-fg));
+}
+
+.sidebar-link:hover {
+  background: hsl(var(--sidebar-border));
+  color: white;
+}
+
+.sidebar-link.active {
+  background: hsl(var(--sidebar-accent));
+  color: white;
+}
+
+/* Cards */
+.stat-card {
+  @apply bg-white rounded-2xl p-6 border border-border shadow-sm hover:shadow-md transition-all duration-200;
+}
+
+/* Status badges */
+.badge-new { @apply bg-blue-100 text-blue-700 border-blue-200; }
+.badge-assigned { @apply bg-yellow-100 text-yellow-700 border-yellow-200; }
+.badge-in-progress { @apply bg-indigo-100 text-indigo-700 border-indigo-200; }
+.badge-pending { @apply bg-orange-100 text-orange-700 border-orange-200; }
+.badge-resolved { @apply bg-green-100 text-green-700 border-green-200; }
+.badge-escalated { @apply bg-red-100 text-red-700 border-red-200; }
+
+/* Severity */
+.badge-low { @apply bg-green-100 text-green-700; }
+.badge-medium { @apply bg-yellow-100 text-yellow-700; }
+.badge-high { @apply bg-red-100 text-red-700; }
+
+/* Animations */
+.animate-fade-in { animation: fade-in 0.4s ease-out; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+/* Table */
+.data-table { @apply w-full text-sm; }
+.data-table thead tr { @apply border-b border-border bg-muted/50; }
+.data-table thead th { @apply px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider; }
+.data-table tbody tr { @apply border-b border-border hover:bg-muted/30 transition-colors; }
+.data-table tbody td { @apply px-4 py-3; }
+
+/* Form */
+.form-label { @apply block text-sm font-medium text-foreground mb-1.5; }
+.form-input {
+  @apply w-full px-3 py-2.5 rounded-lg border border-input bg-white text-foreground text-sm
+         focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all;
+}
+.form-select { @apply form-input appearance-none cursor-pointer; }
+.form-textarea { @apply form-input resize-none; }
