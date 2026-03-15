@@ -1,43 +1,26 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-const api = axios.create({
-  baseURL: `${API_URL}/api`,
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+const API = axios.create({
+  baseURL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  const token = Cookies.get("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      Cookies.remove("token");
-      Cookies.remove("user");
-
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
-    }
-
-    return Promise.reject(err);
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error(
+      "API Error:",
+      error?.response?.data || error.message || error
+    );
+    return Promise.reject(error);
   }
 );
 
-export default api;
-
-
+export default API;

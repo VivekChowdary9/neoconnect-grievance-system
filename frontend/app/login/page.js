@@ -1,60 +1,91 @@
 "use client";
 
 import { useState } from "react";
-import { login } from "../../services/authService";
+import { useRouter } from "next/navigation";
+import { loginUser } from "../../services/authService";
 
 export default function LoginPage() {
+  const router = useRouter();
 
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = async (e) => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => 
+    {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    try{
+    try {
+      const data = await loginUser(formData);
 
-      await login({ email,password });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data));
+      }
 
-      alert("Login Successful");
-
-      window.location.href="/dashboard";
-
-    }catch(err){
-
-      alert(err.response?.data?.message || "Login Failed");
-
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError(
+        err?.response?.data?.message ||
+          "Login failed. Please check your credentials or backend."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
-  return(
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md space-y-4 rounded-lg border p-6 shadow"
+      >
+        <h1 className="text-2xl font-bold">Login</h1>
 
-    <div style={{padding:"40px"}}>
-
-      <h2>Login</h2>
-
-      <form onSubmit={handleSubmit}>
-
-        <input
-        type="email"
-        placeholder="Email"
-        onChange={(e)=>setEmail(e.target.value)}
-        required
-        />
-
-        <br/><br/>
+        {error && <p className="text-red-600">{error}</p>}
 
         <input
-        type="password"
-        placeholder="Password"
-        onChange={(e)=>setPassword(e.target.value)}
-        required
+          type="email"
+          name="email"
+          placeholder="Enter email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full rounded border p-2"
+          required
+       
+       />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter password"
+          value={formData.password}
+          onChange={handleChange}
+          className="w-full rounded border p-2"
+          required
         />
 
-        <br/><br/>
-
-        <button type="submit">Login</button>
-
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded bg-black p-2 text-white"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
 
 
@@ -65,5 +96,8 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
+
 
 
