@@ -1,41 +1,24 @@
 import api from "./api";
 import Cookies from "js-cookie";
 
-export const authService = {
-  async login(email, password) {
-    const { data } = await api.post("/auth/login", { email, password });
-    Cookies.set("token", data.token, { expires: 7 });
-    Cookies.set("user", JSON.stringify(data), { expires: 7 });
-    return data;
-  },
+export const login = async (data) => {
+  const res = await api.post("/auth/login", data);
 
-  async register(userData) {
-    const { data } = await api.post("/auth/register", userData);
-    Cookies.set("token", data.token, { expires: 7 });
-    Cookies.set("user", JSON.stringify(data), { expires: 7 });
-    return data;
-  },
+  Cookies.set("token", res.data.token);
+  Cookies.set("user", JSON.stringify(res.data.user));
 
-  async getMe() {
-    const { data } = await api.get("/auth/me");
-    return data;
-  },
+  return res.data;
+};
 
-  logout() {
-    Cookies.remove("token");
-    Cookies.remove("user");
-  },
+export const register = async (data) => {
+  const res = await api.post("/auth/register", data);
 
-  getCurrentUser() {
-    try {
-      const user = Cookies.get("user");
-      return user ? JSON.parse(user) : null;
-    } catch {
-      return null;
-    }
-  },
+  return res.data;
+};
 
-  isAuthenticated() {
-    return !!Cookies.get("token");
-  },
+export const logout = () => {
+  Cookies.remove("token");
+  Cookies.remove("user");
+
+  window.location.href = "/login";
 };
