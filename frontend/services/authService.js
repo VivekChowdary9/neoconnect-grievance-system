@@ -10,7 +10,15 @@ export const loginUser = async (userData) => {
   return response.data;
 };
 
-export const getMe = async () => {
+export const getCurrentUser = async () => {
   const response = await API.get("/auth/me");
   return response.data;
 };
+
+const authService = {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+};
+
+export default authService;

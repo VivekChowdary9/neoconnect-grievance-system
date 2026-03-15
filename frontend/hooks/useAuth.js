@@ -1,48 +1,93 @@
 "use client";
-import { useState, useEffect, createContext, useContext } from "react";
-import { useRouter } from "next/navigation";
-import { authService } from "../services/authService";
 
-const AuthContext = createContext(null);
+import { createContext, useContext, useEffect, useState } from "react";
+import authService from "../services/authService";
+
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+
+
+  
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    setUser(currentUser);
-    setLoading(false);
+    const loadUser = async () => {
+      try {
+        const token =
+          typeof window !== "undefined"
+            ? localStorage.getItem("token")
+            : null;
+
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const data = await authService.getCurrentUser();
+        setUser(data);
+      } catch (error) {
+        console.error("Failed to load current user:", error);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
   }, []);
 
-  const login = async (email, password) => {
-    const data = await authService.login(email, password);
+  const login = async (formData) => {
+    const data = await authService.loginUser(formData);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+    }
+
     setUser(data);
     return data;
   };
 
-  const register = async (userData) => {
-    const data = await authService.register(userData);
-    setUser(data);
+  const register = async (formData) => {
+    const data = await authService.registerUser(formData);
     return data;
   };
 
   const logout = () => {
-    authService.logout();
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
     setUser(null);
-    router.push("/login");
+
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        loading,
+        login,
+        register,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+  return useContext(AuthContext);
 }
+
+
+
+
