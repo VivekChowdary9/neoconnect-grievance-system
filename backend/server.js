@@ -17,7 +17,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: [
+      "http://localhost:3000",
+      "https://your-vercel-app.vercel.app",
+      "https://neoconnect-grievance-system-9ib6pymkf-vivekchowdary9s-projects.vercel.app"
+    ],
     credentials: true,
   })
 );
